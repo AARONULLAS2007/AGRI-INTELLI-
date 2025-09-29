@@ -30,21 +30,9 @@ const LivePestMonitorPanel: React.FC<LivePestMonitorPanelProps> = ({ language })
   }, []);
 
   const startCamera = async () => {
-    stopCamera();
-    setError(null);
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' }
-      });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        streamRef.current = stream;
-        setIsCameraOn(true);
-      }
-    } catch (err) {
-      console.error("Error accessing camera:", err);
-      setError("Could not access camera. Please check permissions.");
-    }
+    // This functionality is disabled as per user request to remove camera permissions.
+    // To re-enable, add "camera" to metadata.json and remove the disabled prop from the button.
+    setError(t.cameraDisabled);
   };
 
   const handleScan = useCallback(async () => {
@@ -114,7 +102,14 @@ const LivePestMonitorPanel: React.FC<LivePestMonitorPanelProps> = ({ language })
         </div>
         <div className="flex flex-wrap gap-2 mt-4">
             {!isCameraOn ? (
-                 <button onClick={startCamera} className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">{t.startCamera}</button>
+                 <button 
+                    onClick={startCamera} 
+                    className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                    disabled={true}
+                    title={t.cameraDisabled}
+                 >
+                    {t.startCamera}
+                 </button>
             ): (
                 <>
                     <button onClick={handleScan} disabled={isLoading || isAutoScanEnabled} className="flex-1 bg-primary hover:bg-primary-dark text-white px-4 py-2 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed">{t.scanForPests}</button>

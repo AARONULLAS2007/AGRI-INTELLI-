@@ -33,23 +33,9 @@ const PestIdentifierPanel: React.FC<PestIdentifierPanelProps> = ({ language }) =
   };
 
   const startCamera = async () => {
-    stopCamera();
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' }
-      });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        streamRef.current = stream;
-        setIsCameraOn(true);
-        setImage(null);
-        setPreviewUrl(null);
-        setResult(null);
-      }
-    } catch (err) {
-      console.error("Error accessing camera:", err);
-      setError("Could not access camera. Please check permissions.");
-    }
+    // This functionality is disabled as per user request to remove camera permissions.
+    // To re-enable, add "camera" to metadata.json and remove the disabled prop from the button.
+    setError(t.cameraDisabled);
   };
 
   const stopCamera = useCallback(() => {
@@ -107,7 +93,14 @@ const PestIdentifierPanel: React.FC<PestIdentifierPanelProps> = ({ language }) =
           <button onClick={() => fileInputRef.current?.click()} className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">{t.uploadImage}</button>
           <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
           {!isCameraOn ? (
-            <button onClick={startCamera} className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">{t.useCamera}</button>
+            <button 
+                onClick={startCamera} 
+                className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                disabled={true}
+                title={t.cameraDisabled}
+            >
+                {t.useCamera}
+            </button>
           ) : (
             <>
               <button onClick={captureImage} className="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">{t.capture}</button>

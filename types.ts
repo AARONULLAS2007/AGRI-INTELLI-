@@ -1,4 +1,3 @@
-
 export type Language = 'en' | 'es' | 'de' | 'ja';
 
 export interface ChartDataPoint {
@@ -31,6 +30,7 @@ export interface FarmSectorData {
   id: number;
   pestRisk: number; // 0-100
   soilMoisture: number; // 0-100
+  pestType: string;
 }
 
 export interface Nutrients {
@@ -66,6 +66,7 @@ export interface Alert {
   type: 'warning' | 'critical';
   message: string;
   sector: number;
+  action: string;
 }
 
 export enum WeatherCondition {
@@ -94,7 +95,7 @@ export enum MapOverlay {
   NDVI = 'NDVI',
   NDWI = 'NDWI',
   SoilMoisture = 'SoilMoisture',
-  SoilAnalysis = 'SoilAnalysis',
+  SoilHealth = 'SoilHealth',
   PestRisk = 'PestRisk',
 }
 
@@ -124,4 +125,36 @@ export interface PlantHealthAnalysisResponse {
 export interface SoilHealthScoreResponse {
   score: number;
   rating: 'Poor' | 'Fair' | 'Good' | 'Excellent';
+  recommendation: string;
+}
+
+export interface PestRiskPrediction {
+  day: string;
+  risk: number; // 0-100
+}
+
+export interface YieldPrediction {
+  value: number; // e.g., 5.2
+  unit: string; // e.g., 'tons/acre'
+  factors: string[];
+}
+
+export interface HistoricalDataPoint {
+  day: string;
+  value: number;
+}
+
+export interface PredictiveAnalyticsData {
+  pestRiskForecast: PestRiskPrediction[];
+  yieldPrediction: YieldPrediction;
+  weatherForecast: WeatherForecast[];
+  historicalYield: HistoricalDataPoint[];
+}
+
+export interface MarketPrice {
+  id: string;
+  name: string;
+  price: number;
+  change: number;
+  unit: string;
 }

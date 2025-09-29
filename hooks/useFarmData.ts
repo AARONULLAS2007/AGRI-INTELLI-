@@ -1,6 +1,7 @@
 
+
 import { useState, useEffect } from 'react';
-import type { FarmData, ChartDataPoint, KeyMetrics, FarmSectorData, FarmConditions, CurrentWeather } from '../types';
+import type { FarmData, ChartDataPoint, KeyMetrics, FarmSectorData, FarmConditions, CurrentWeather, Nutrients } from '../types';
 import { WeatherCondition } from '../types';
 
 const generateInitialChartData = (): ChartDataPoint[] => {
@@ -27,10 +28,10 @@ const generateInitialMetrics = (): KeyMetrics => ({
 });
 
 const generateInitialSectors = (): FarmSectorData[] => ([
-    { id: 1, pestRisk: 25, soilMoisture: 45 },
-    { id: 2, pestRisk: 80, soilMoisture: 50 },
-    { id: 3, pestRisk: 15, soilMoisture: 25 },
-    { id: 4, pestRisk: 40, soilMoisture: 60 },
+    { id: 1, pestRisk: 25, soilMoisture: 45, pestType: 'Aphids' },
+    { id: 2, pestRisk: 80, soilMoisture: 50, pestType: 'Spider Mites' },
+    { id: 3, pestRisk: 15, soilMoisture: 25, pestType: 'Thrips' },
+    { id: 4, pestRisk: 40, soilMoisture: 60, pestType: 'Whiteflies' },
 ]);
 
 const generateInitialConditions = (): FarmConditions => ({
@@ -85,37 +86,39 @@ const useFarmData = () => {
 
         // Sectors update
         const newSectors = prevData.sectors.map(sector => ({
-            ...sector,
-            pestRisk: Math.max(0, Math.min(100, sector.pestRisk + (Math.random() - 0.45) * 5)),
-            soilMoisture: Math.max(0, Math.min(100, sector.soilMoisture + (Math.random() - 0.5) * 5)),
+          ...sector,
+          pestRisk: Math.max(0, Math.min(100, sector.pestRisk + (Math.random() - 0.4) * 10)),
+          soilMoisture: Math.max(0, Math.min(100, sector.soilMoisture + (Math.random() - 0.5) * 5)),
         }));
+        
+        const newWeather: CurrentWeather = {
+            ...prevData.currentWeather,
+            temperature: prevData.currentWeather.temperature + (Math.random() - 0.5) * 0.2,
+            humidity: Math.max(20, Math.min(90, prevData.currentWeather.humidity + (Math.random() - 0.5) * 2)),
+        };
 
-        // Conditions & Weather update
+        // Conditions update (nutrients)
+        const newNutrients: Nutrients = {
+            nitrogen: Math.max(40, prevData.conditions.nutrients.nitrogen - 0.2), // prevent from going too low too fast
+            phosphorus: Math.max(20, prevData.conditions.nutrients.phosphorus - 0.1),
+            potassium: Math.max(30, prevData.conditions.nutrients.potassium - 0.15),
+        };
+
         const newConditions: FarmConditions = {
             ...prevData.conditions,
-            ph: Math.max(5, Math.min(8.5, prevData.conditions.ph + (Math.random() - 0.5) * 0.1)),
-            nutrients: {
-                nitrogen: Math.max(50, prevData.conditions.nutrients.nitrogen + (Math.random() - 0.5) * 5),
-                phosphorus: Math.max(20, prevData.conditions.nutrients.phosphorus + (Math.random() - 0.5) * 2),
-                potassium: Math.max(30, prevData.conditions.nutrients.potassium + (Math.random() - 0.5) * 4),
-            }
+            nutrients: newNutrients,
         };
-        
-        const newCurrentWeather: CurrentWeather = {
-            ...prevData.currentWeather,
-            temperature: prevData.currentWeather.temperature + (Math.random() - 0.5) * 0.5,
-            humidity: Math.max(30, Math.min(90, prevData.currentWeather.humidity + (Math.random() - 0.5) * 2)),
-        }
 
         return {
-          chartData: newChartData,
-          keyMetrics: newMetrics,
-          sectors: newSectors,
-          conditions: newConditions,
-          currentWeather: newCurrentWeather,
+            ...prevData,
+            keyMetrics: newMetrics,
+            chartData: newChartData,
+            sectors: newSectors,
+            currentWeather: newWeather,
+            conditions: newConditions,
         };
       });
-    }, 3000);
+    }, 2000);
 
     return () => clearInterval(interval);
   }, []);

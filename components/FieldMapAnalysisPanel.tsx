@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import Panel from './Panel';
 import type { Language } from '../types';
@@ -14,7 +13,7 @@ const OVERLAY_COLORS: Record<MapOverlay, string> = {
     [MapOverlay.NDVI]: 'from-red-500/50 via-yellow-500/50 to-green-500/50',
     [MapOverlay.NDWI]: 'from-yellow-500/50 via-cyan-500/50 to-blue-500/50',
     [MapOverlay.SoilMoisture]: 'from-orange-700/50 via-blue-500/50 to-blue-900/50',
-    [MapOverlay.SoilAnalysis]: 'from-stone-500/50 via-lime-500/50 to-emerald-500/50',
+    [MapOverlay.SoilHealth]: 'from-red-500/50 via-yellow-500/50 to-green-500/50',
     [MapOverlay.PestRisk]: 'from-green-500/50 via-yellow-500/50 to-red-600/50',
 }
 
@@ -36,7 +35,7 @@ const FieldMapAnalysisPanel: React.FC<FieldMapAnalysisPanelProps> = ({ language 
             <option value={MapOverlay.NDVI}>NDVI</option>
             <option value={MapOverlay.NDWI}>NDWI</option>
             <option value={MapOverlay.SoilMoisture}>{t.soilMoisture}</option>
-            <option value={MapOverlay.SoilAnalysis}>{t.soilAnalysis}</option>
+            <option value={MapOverlay.SoilHealth}>{t.soilHealth}</option>
             <option value={MapOverlay.PestRisk}>{t.pestRisk}</option>
           </select>
         </div>

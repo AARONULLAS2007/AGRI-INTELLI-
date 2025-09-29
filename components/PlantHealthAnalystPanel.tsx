@@ -1,4 +1,5 @@
 
+
 import React, { useState, useRef, useCallback } from 'react';
 import Panel from './Panel';
 import type { Language, PlantHealthAnalysisResponse, FarmData } from '../types';
@@ -34,23 +35,9 @@ const PlantHealthAnalystPanel: React.FC<PlantHealthAnalystPanelProps> = ({ langu
   };
 
   const startCamera = async () => {
-    stopCamera();
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' }
-      });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        streamRef.current = stream;
-        setIsCameraOn(true);
-        setImage(null);
-        setPreviewUrl(null);
-        setResult(null);
-      }
-    } catch (err) {
-      console.error("Error accessing camera:", err);
-      setError("Could not access camera. Please check permissions.");
-    }
+    // This functionality is disabled as per user request to remove camera permissions.
+    // To re-enable, add "camera" to metadata.json and remove the disabled prop from the button.
+    setError(t.cameraDisabled);
   };
 
   const stopCamera = useCallback(() => {
@@ -112,7 +99,23 @@ const PlantHealthAnalystPanel: React.FC<PlantHealthAnalystPanelProps> = ({ langu
         <div>
             <h5 className="text-sm font-semibold text-muted-light dark:text-muted-dark">{t.recommendations}</h5>
             <ul className="list-disc list-inside text-sm space-y-1">
-                {data.recommendations.map((rec, i) => <li key={i}>{rec}</li>)}
+                {data.recommendations.map((rec, i) => {
+                    const isUrgent = rec.toLowerCase().startsWith('urgent:');
+                    const isAction = rec.toLowerCase().startsWith('action:');
+                    const keyword = isUrgent ? 'Urgent:' : isAction ? 'Action:' : null;
+                    const restOfRec = keyword ? rec.substring(keyword.length) : rec;
+
+                    return (
+                        <li key={i}>
+                            {keyword && (
+                                <strong className={isUrgent ? 'text-red-400' : 'text-yellow-400'}>
+                                    {keyword}
+                                </strong>
+                            )}
+                            {restOfRec}
+                        </li>
+                    );
+                })}
             </ul>
         </div>
         {data.growth_trends && (
@@ -137,7 +140,14 @@ const PlantHealthAnalystPanel: React.FC<PlantHealthAnalystPanelProps> = ({ langu
           <button onClick={() => fileInputRef.current?.click()} className="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">{t.uploadImage}</button>
           <input type="file" accept="image/*" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
           {!isCameraOn ? (
-            <button onClick={startCamera} className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">{t.useCamera}</button>
+            <button 
+                onClick={startCamera} 
+                className="flex-1 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                disabled={true}
+                title={t.cameraDisabled}
+            >
+                {t.useCamera}
+            </button>
           ) : (
             <>
               <button onClick={captureImage} className="flex-1 bg-indigo-500 hover:bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">{t.capture}</button>

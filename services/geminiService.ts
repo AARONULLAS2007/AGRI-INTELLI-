@@ -53,17 +53,42 @@ export const getPlantHealthAnalysis = async (imageFile: File, farmData: FarmData
     console.log("MOCK: Analyzing plant health from image and data:", imageFile.name, farmData);
     await sleep(2000);
 
-    return {
-        plant_health_status: "Healthy",
-        growth_stage: "Vegetative",
-        stress_factors: ["None detected at this time."],
-        recommendations: [
-            "Maintain current watering and nutrient schedule.", 
-            "Ensure good air circulation to prevent fungal issues.",
-            "Continue monitoring for pests weekly."
-        ],
-        growth_trends: "The plant is exhibiting a steady growth rate consistent with its vegetative stage."
-    };
+    // Simulate different results
+    const rand = Math.random();
+    if (rand > 0.66) {
+        return {
+            plant_health_status: "Healthy",
+            growth_stage: "Vegetative",
+            stress_factors: ["None detected."],
+            recommendations: [
+                "Maintain current watering and nutrient schedule.",
+                "Ensure good air circulation to prevent fungal issues.",
+            ],
+            growth_trends: "The plant is exhibiting a steady growth rate."
+        };
+    } else if (rand > 0.33) {
+        return {
+            plant_health_status: "Stressed",
+            growth_stage: "Vegetative",
+            stress_factors: ["Nitrogen Deficiency (slight yellowing of lower leaves)"],
+            recommendations: [
+                "Action: Apply 10 kg/acre of Urea as a top dressing within 3 days.",
+                "Increase irrigation frequency by 15% for the next week.",
+                "Monitor for improvement in leaf color.",
+            ],
+        };
+    } else {
+        return {
+            plant_health_status: "Needs Attention",
+            growth_stage: "Flowering",
+            stress_factors: ["Phosphorus Deficiency", "Early signs of powdery mildew"],
+            recommendations: [
+                "Urgent: Foliar spray with a high-phosphorus fertilizer (e.g., 10-52-10 NPK) immediately.",
+                "Action: Apply a targeted fungicide suitable for powdery mildew to affected areas only.",
+                "Isolate affected plants if possible to prevent spread."
+            ],
+        };
+    }
 };
 
 export const getSoilHealthScore = async (
@@ -97,9 +122,32 @@ export const getSoilHealthScore = async (
       if (score >= 85) rating = 'Excellent';
       else if (score >= 70) rating = 'Good';
       else if (score >= 50) rating = 'Fair';
+      
+      let recommendation = "Soil appears balanced. Maintain current fertilization and watering schedules.";
+      
+      if (score < 50) { // Poor
+          if (conditions.ph < 6.0) {
+              recommendation = "Critical: Soil is too acidic. Apply 50 kg/acre of agricultural lime immediately to raise pH.";
+          } else if (conditions.nutrients.nitrogen < 100) {
+              recommendation = "Action required: Severe nitrogen deficiency detected. Apply 30 kg/acre of Urea fertilizer within the next 2 days.";
+          } else {
+              recommendation = "Action required: Soil health is poor. Conduct a detailed soil test to identify specific deficiencies.";
+          }
+      } else if (score < 70) { // Fair
+          if (conditions.ph > 7.5) {
+               recommendation = "Recommendation: Soil is slightly alkaline. Incorporate 10 tons/acre of compost to gradually lower pH.";
+          } else if (conditions.nutrients.potassium < 70) {
+              recommendation = "Recommendation: Potassium levels are suboptimal. Apply 15 kg/acre of Muriate of Potash before the next growth stage.";
+          } else {
+              recommendation = "Soil is fair but can be improved. Consider adding organic matter like compost to enhance nutrient retention.";
+          }
+      } else if (score >= 85) { // Excellent
+          recommendation = "Excellent soil health detected. No immediate action required. Continue best practices for soil management."
+      }
 
       return {
         score: Math.round(score),
         rating: rating,
+        recommendation: recommendation,
       };
     };

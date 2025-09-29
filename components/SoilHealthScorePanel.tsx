@@ -127,24 +127,28 @@ const SoilHealthScorePanel: React.FC<SoilHealthScorePanelProps> = ({ farmData, l
     return (
         <Panel title={t.soilHealthScore} actions={RefreshButton}>
             <div className="h-full flex flex-col items-center justify-between text-center">
-                <div className="flex-grow flex items-center justify-center">
+                <div className="flex-grow flex flex-col items-center justify-center w-full">
                     {isLoading && (
-                        <>
+                        <div className="flex items-center">
                             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
                             <p className="ml-3">{t.generatingScore}</p>
-                        </>
+                        </div>
                     )}
                     {error && <div className="text-red-400 p-4 bg-red-500/10 rounded-lg">{error}</div>}
                     {!isLoading && !error && scoreData && (
-                        <ScoreGauge score={scoreData.score} rating={t[scoreData.rating.toLowerCase() as keyof typeof t] || scoreData.rating} />
-                    )}
-                    {!isLoading && !error && !scoreData && (
                         <>
-                            <div className="flex flex-col items-center">
-                                <SproutIcon className="w-12 h-12 text-muted-light dark:text-muted-dark mb-4"/>
-                                <p className="text-muted-light dark:text-muted-dark">{t.clickToGetScore}</p>
+                            <ScoreGauge score={scoreData.score} rating={t[scoreData.rating.toLowerCase() as keyof typeof t] || scoreData.rating} />
+                            <div className="mt-4 w-full text-left p-3 bg-background-light dark:bg-background-dark rounded-lg">
+                                <h4 className="font-bold text-md text-primary">{t.actionableAdvice}</h4>
+                                <p className="text-sm mt-1">{scoreData.recommendation}</p>
                             </div>
                         </>
+                    )}
+                    {!isLoading && !error && !scoreData && (
+                        <div className="flex flex-col items-center">
+                            <SproutIcon className="w-12 h-12 text-muted-light dark:text-muted-dark mb-4"/>
+                            <p className="text-muted-light dark:text-muted-dark">{t.clickToGetScore}</p>
+                        </div>
                     )}
                 </div>
                  <div className="mt-4 flex items-center justify-end flex-shrink-0 w-full">
